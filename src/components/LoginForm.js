@@ -1,25 +1,39 @@
 import { useState } from 'react';
 import axios from 'axios';
+import auth from './auth/auth'
 
-const projectID = '20ab33de-b351-49f8-8fe3-4e5d850e8a93';
-
-const Modal = () => {
-    const [username, setUsername] = useState('');
+const Modal = (props) => {
     const [password, setPassword] = useState('');
+    const [identifier, setIdentifier] = useState('');
     const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const authObject = { 'Project-ID': projectID, 'User-Name': username, 'User-Secret': password };
-
         try {
-            await axios.get('https://api.chatengine.io/chats', { headers: authObject });
+            const data = {
+                identifier,
+                password
+            }
 
-            localStorage.setItem('username', username);
-            localStorage.setItem('password', password);
+            const loginResponse = await axios.post('https://partner-in-magic.herokuapp.com/auth/local', data)
+            const userDetails = loginResponse.data.user;
 
-            window.location.reload();
+            if (loginResponse.status === 200) {
+                localStorage.setItem('username', userDetails.username);
+                localStorage.setItem('userId', userDetails.userId);
+                localStorage.setItem('jwt', loginResponse.jwt);
+
+                auth.login(() => {
+                    props.history.push("/app");
+                });
+            }
+            // await axios.get('https://api.chatengine.io/chats', { headers: authObject });
+
+            // localStorage.setItem('username', username);
+            // localStorage.setItem('password', password);
+
+            // window.location.reload();
             setError('');
         } catch (err) {
             setError('Oops, incorrect credentials.');
@@ -31,7 +45,7 @@ const Modal = () => {
             <div className="form">
                 <h1 className="title">Chat Application</h1>
                 <form onSubmit={handleSubmit}>
-                    <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="input" placeholder="Username" required />
+                    <input type="text" value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="input" placeholder="Email" required />
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input" placeholder="Password" required />
                     <div align="center">
                         <button type="submit" className="button">
