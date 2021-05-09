@@ -57,7 +57,7 @@ const Modal = (props) => {
     return (
         <div className="wrapper">
             <div className="form">
-                <h1 className="title">Register as a new user</h1>
+                <h1 className="title">Register</h1>
                 <form onSubmit={handleSubmit}>
                     <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} className="input" placeholder="Email" required />
                     <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} className="input" placeholder="Username" required />

@@ -19,14 +19,23 @@ const Modal = (props) => {
             const loginResponse = await axios.post('https://partner-in-magic.herokuapp.com/auth/local', data)
             const userDetails = loginResponse.data.user;
 
+
+            console.log(loginResponse, "LOGIN RESPONSE")
             if (loginResponse.status === 200) {
                 localStorage.setItem('username', userDetails.username);
-                localStorage.setItem('userId', userDetails.userId);
-                localStorage.setItem('jwt', loginResponse.jwt);
+                localStorage.setItem('userId', userDetails.id);
+                localStorage.setItem('jwt', loginResponse.data.jwt);
+                localStorage.setItem('password', password);
 
-                auth.login(() => {
-                    props.history.push("/app");
-                });
+                if (!loginResponse.data.user.isQuestionsAnswered) {
+                    auth.login(() => {
+                        props.history.push("/questions");
+                    });
+                } else {
+                    auth.login(() => {
+                        props.history.push("/app");
+                    });
+                }
             }
             // await axios.get('https://api.chatengine.io/chats', { headers: authObject });
 
@@ -43,7 +52,7 @@ const Modal = (props) => {
     return (
         <div className="wrapper">
             <div className="form">
-                <h1 className="title">Chat Application</h1>
+                <h1 className="title">Login</h1>
                 <form onSubmit={handleSubmit}>
                     <input type="text" value={identifier} onChange={(e) => setIdentifier(e.target.value)} className="input" placeholder="Email" required />
                     <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="input" placeholder="Password" required />
